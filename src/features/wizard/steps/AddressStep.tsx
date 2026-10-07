@@ -17,6 +17,7 @@ function AddressStep({ value, errors, onChange }: AddressStepProps) {
           id="country"
           value={value.country}
           className={fieldClass}
+          aria-required="true"
           aria-invalid={errors.country ? true : undefined}
           aria-describedby={errors.country ? 'country-error' : undefined}
           onChange={(event) => onChange({ ...value, country: event.target.value })}

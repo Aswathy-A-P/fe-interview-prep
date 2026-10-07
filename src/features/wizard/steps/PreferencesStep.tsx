@@ -28,7 +28,10 @@ function PreferencesStep({ value, errors, onChange }: PreferencesStepProps) {
   return (
     <>
       <fieldset
+        role="radiogroup"
         className="mb-4 flex flex-col gap-1 border-0 p-0"
+        aria-required="true"
+        aria-invalid={errors.plan ? true : undefined}
         aria-describedby={errors.plan ? 'plan-error' : undefined}
       >
         <legend className="mb-1 p-0">Plan</legend>
@@ -36,6 +39,7 @@ function PreferencesStep({ value, errors, onChange }: PreferencesStepProps) {
           {PLANS.map((plan) => (
             <label key={plan} className="flex items-center gap-1">
               <input
+                id={`plan-${plan}`}
                 type="radio"
                 name="plan"
                 value={plan}
@@ -61,6 +65,7 @@ function PreferencesStep({ value, errors, onChange }: PreferencesStepProps) {
             value={draft}
             placeholder="e.g. React"
             className={cn(fieldClass, 'flex-1')}
+            aria-required="true"
             aria-invalid={errors.skills ? true : undefined}
             aria-describedby={errors.skills ? 'skills-error' : undefined}
             onChange={(event) => setDraft(event.target.value)}

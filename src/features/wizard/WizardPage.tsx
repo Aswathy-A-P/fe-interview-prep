@@ -1,9 +1,10 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import Button from '../../components/ui/Button.tsx';
 import { cardClass } from '../../components/ui/fieldStyles.ts';
 import { cn } from '../../lib/cn.ts';
 import { usePersistentState } from '../../hooks/usePersistentState.ts';
 import { submitRegistration, type SubmitRegistration } from './api.ts';
+import ErrorSummary from './ErrorSummary.tsx';
 import ProgressIndicator from './ProgressIndicator.tsx';
 import {
   emptyRegistration,
@@ -46,6 +47,28 @@ function WizardPage({ submit = submitRegistration }: WizardPageProps) {
   const [showErrors, setShowErrors] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
   const [registeredName, setRegisteredName] = useState('');
+  const [attempt, setAttempt] = useState(0);
+  const formRef = useRef<HTMLFormElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const shownStep = useRef(step);
+
+  useEffect(() => {
+    if (shownStep.current === step) return;
+    shownStep.current = step;
+    headingRef.current?.focus();
+  }, [step]);
+
+  useEffect(() => {
+    if (attempt === 0) return;
+    const invalid = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+    const target = invalid?.matches('input, select') ? invalid : invalid?.querySelector('input');
+    target?.focus();
+  }, [attempt]);
+
+  const showStepErrors = () => {
+    setShowErrors(true);
+    setAttempt((count) => count + 1);
+  };
 
   const goTo = (target: StepId) => {
     setStep(target);
@@ -56,7 +79,7 @@ function WizardPage({ submit = submitRegistration }: WizardPageProps) {
     const invalidStep = STEPS.find((candidate) => !hasNoErrors(validateStep(candidate, data)));
     if (invalidStep) {
       setStep(invalidStep);
-      setShowErrors(true);
+      showStepErrors();
       return;
     }
     setStatus('submitting');
@@ -78,7 +101,7 @@ function WizardPage({ submit = submitRegistration }: WizardPageProps) {
       return;
     }
     if (!hasNoErrors(validateStep(step, data))) {
-      setShowErrors(true);
+      showStepErrors();
       return;
     }
     goTo(nextStep(step));
@@ -106,8 +129,12 @@ function WizardPage({ submit = submitRegistration }: WizardPageProps) {
       <h1 className="mb-4 text-3xl font-bold">Registration Wizard</h1>
       <ProgressIndicator current={step} />
 
-      <form className={cn(cardClass, 'px-5 py-4')} noValidate onSubmit={handleSubmit}>
-        <h2 className="mb-4 text-xl font-semibold">{STEP_LABELS[step]}</h2>
+      <form ref={formRef} className={cn(cardClass, 'px-5 py-4')} noValidate onSubmit={handleSubmit}>
+        <h2 ref={headingRef} tabIndex={-1} className="mb-4 text-xl font-semibold outline-none">
+          {STEP_LABELS[step]}
+        </h2>
+
+        {showErrors && <ErrorSummary key={attempt} errors={validateStep(step, data)} />}
 
         {step === 'personal' && (
           <PersonalStep

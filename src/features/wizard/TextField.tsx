@@ -29,6 +29,7 @@ function TextField({
         value={value}
         autoComplete={autoComplete}
         className={fieldClass}
+        aria-required="true"
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         onChange={(event) => onChange(event.target.value)}
