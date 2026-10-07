@@ -28,7 +28,7 @@ Stack: Vite, React 19, TypeScript (strict), React Router, Vitest, Testing Librar
 |---|---|---|
 | 1 | Todo App | [#1](https://github.com/Aswathy-A-P/fe-interview-prep/pull/1) |
 | 2 | Live Search | |
-| 3 | Registration Wizard | |
+| 3 | Registration Wizard | [#3](https://github.com/Aswathy-A-P/fe-interview-prep/pull/3) |
 | 4 | Data Table | |
 | 5 | Login & Session Handling | |
 
