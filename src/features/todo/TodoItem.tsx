@@ -1,4 +1,7 @@
 import { useState, type FormEvent, type KeyboardEvent } from 'react';
+import Button from '../../components/ui/Button.tsx';
+import { fieldClass } from '../../components/ui/fieldStyles.ts';
+import { cn } from '../../lib/cn.ts';
 import type { Todo } from './todos.ts';
 
 interface TodoItemProps {
@@ -23,7 +26,7 @@ function TodoItem({ todo, onToggle, onRename, onDelete }: TodoItemProps) {
   };
 
   return (
-    <li className={`todo-item${todo.completed ? ' done' : ''}`}>
+    <li className="flex items-center gap-2 border-b border-border px-3 py-2 last:border-b-0">
       <input
         type="checkbox"
         checked={todo.completed}
@@ -31,38 +34,42 @@ function TodoItem({ todo, onToggle, onRename, onDelete }: TodoItemProps) {
         aria-label={`Mark "${todo.title}" as ${todo.completed ? 'active' : 'completed'}`}
       />
       {isEditing ? (
-        <form onSubmit={save} className="todo-edit">
+        <form onSubmit={save} className="flex flex-1 items-center gap-2">
           <input
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={cancelOnEscape}
             aria-label={`Edit "${todo.title}"`}
+            className={cn(fieldClass, 'flex-1')}
             autoFocus
           />
-          <button type="submit">Save</button>
-          <button type="button" onClick={() => setDraft(null)}>
+          <Button type="submit">Save</Button>
+          <Button type="button" onClick={() => setDraft(null)}>
             Cancel
-          </button>
+          </Button>
         </form>
       ) : (
         <>
-          <span className="todo-title" onDoubleClick={() => setDraft(todo.title)}>
+          <span
+            className={cn('flex-1', todo.completed && 'text-muted line-through')}
+            onDoubleClick={() => setDraft(todo.title)}
+          >
             {todo.title}
           </span>
-          <button
+          <Button
             type="button"
             onClick={() => setDraft(todo.title)}
             aria-label={`Edit "${todo.title}"`}
           >
             Edit
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={() => onDelete(todo.id)}
             aria-label={`Delete "${todo.title}"`}
           >
             Delete
-          </button>
+          </Button>
         </>
       )}
     </li>
