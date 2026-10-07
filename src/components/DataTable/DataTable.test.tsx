@@ -83,4 +83,19 @@ describe('DataTable', () => {
     );
     expect(screen.getByText('Nothing here.')).toBeInTheDocument();
   });
+
+  it('leaves out hidden columns', () => {
+    render(
+      <DataTable
+        rows={fruits}
+        columns={columns}
+        getRowId={(fruit) => fruit.name}
+        sort={null}
+        onSortChange={() => {}}
+        hiddenColumns={['price']}
+      />,
+    );
+    expect(screen.getAllByRole('columnheader')).toHaveLength(1);
+    expect(screen.queryByRole('cell', { name: '$3' })).not.toBeInTheDocument();
+  });
 });

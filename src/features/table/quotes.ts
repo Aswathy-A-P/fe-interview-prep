@@ -25,6 +25,26 @@ export async function fetchQuotes(signal: AbortSignal): Promise<QuoteRow[]> {
   return data.quotes.map(toQuoteRow);
 }
 
+export interface QuotesPage {
+  rows: QuoteRow[];
+  total: number;
+}
+
+export function quotesPageUrl(page: number, size: number): string {
+  return `https://dummyjson.com/quotes?limit=${size}&skip=${(page - 1) * size}`;
+}
+
+export async function fetchQuotesPage(
+  page: number,
+  size: number,
+  signal: AbortSignal,
+): Promise<QuotesPage> {
+  const response = await fetch(quotesPageUrl(page, size), { signal });
+  if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+  const data = (await response.json()) as { quotes: Quote[]; total: number };
+  return { rows: data.quotes.map(toQuoteRow), total: data.total };
+}
+
 export function distinctAuthors(rows: QuoteRow[]): string[] {
   return [...new Set(rows.map((row) => row.author))].sort((a, b) => a.localeCompare(b));
 }
