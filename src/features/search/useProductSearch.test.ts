@@ -1,5 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { Product } from './api.ts';
+import { searchCache } from './searchCache.ts';
 import { useProductSearch } from './useProductSearch.ts';
 
 function product(id: number, title: string): Product {
@@ -13,6 +14,22 @@ function respondWith(products: Product[]): Response {
 describe('useProductSearch', () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    searchCache.clear();
+  });
+
+  it('serves a repeated query from the cache without fetching', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation(async () => respondWith([product(1, 'Phone')]));
+    const { result, rerender } = renderHook(({ query }) => useProductSearch(query), {
+      initialProps: { query: 'phone' },
+    });
+    await waitFor(() => expect(result.current.state.status).toBe('success'));
+
+    rerender({ query: '  PHONE ' });
+
+    expect(result.current.state).toEqual({ status: 'success', products: [product(1, 'Phone')] });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it('is idle for an empty query and does not fetch', () => {
