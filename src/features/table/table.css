@@ -1,0 +1,15 @@
+.quotes-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.quotes-controls input {
+  width: 18rem;
+}
+
+.quotes-controls select {
+  max-width: 16rem;
+}
