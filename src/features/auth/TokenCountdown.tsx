@@ -10,7 +10,7 @@ function TokenCountdown() {
   }, []);
 
   const expiresAt = getAccessTokenExpiresAt();
-  const secondsLeft = expiresAt === null ? 0 : Math.ceil((expiresAt - now) / 1000);
+  const secondsLeft = expiresAt === null ? 0 : Math.floor((expiresAt - now) / 1000);
 
   return (
     <p className="muted" aria-live="off">
