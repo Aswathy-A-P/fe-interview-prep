@@ -1,4 +1,7 @@
 import { useState, type KeyboardEvent } from 'react';
+import Button from '../../../components/ui/Button.tsx';
+import { fieldClass } from '../../../components/ui/fieldStyles.ts';
+import { cn } from '../../../lib/cn.ts';
 import { addSkill, removeSkill } from '../registration.ts';
 import { PLANS, PLAN_LABELS, type FieldErrors, type Preferences } from '../types.ts';
 
@@ -24,11 +27,14 @@ function PreferencesStep({ value, errors, onChange }: PreferencesStepProps) {
 
   return (
     <>
-      <fieldset className="wizard-field" aria-describedby={errors.plan ? 'plan-error' : undefined}>
-        <legend>Plan</legend>
-        <div className="wizard-plans">
+      <fieldset
+        className="mb-4 flex flex-col gap-1 border-0 p-0"
+        aria-describedby={errors.plan ? 'plan-error' : undefined}
+      >
+        <legend className="mb-1 p-0">Plan</legend>
+        <div className="flex items-center gap-3">
           {PLANS.map((plan) => (
-            <label key={plan}>
+            <label key={plan} className="flex items-center gap-1">
               <input
                 type="radio"
                 name="plan"
@@ -41,45 +47,52 @@ function PreferencesStep({ value, errors, onChange }: PreferencesStepProps) {
           ))}
         </div>
         {errors.plan && (
-          <p id="plan-error" className="error">
+          <p id="plan-error" className="text-sm text-danger">
             {errors.plan}
           </p>
         )}
       </fieldset>
 
-      <div className="wizard-field">
+      <div className="mb-4 flex flex-col gap-1">
         <label htmlFor="skill">Skills</label>
-        <div className="wizard-skill-add">
+        <div className="flex items-center gap-3">
           <input
             id="skill"
             value={draft}
             placeholder="e.g. React"
+            className={cn(fieldClass, 'flex-1')}
             aria-invalid={errors.skills ? true : undefined}
             aria-describedby={errors.skills ? 'skills-error' : undefined}
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={addOnEnter}
           />
-          <button type="button" onClick={add}>
+          <Button type="button" onClick={add}>
             Add skill
-          </button>
+          </Button>
         </div>
         {errors.skills && (
-          <p id="skills-error" className="error">
+          <p id="skills-error" className="text-sm text-danger">
             {errors.skills}
           </p>
         )}
         {value.skills.length > 0 && (
-          <ul className="wizard-chips" aria-label="Added skills">
+          <ul className="mt-1 flex list-none flex-wrap gap-2 p-0" aria-label="Added skills">
             {value.skills.map((skill) => (
-              <li key={skill} className="wizard-chip">
+              <li
+                key={skill}
+                className="flex items-center gap-1 rounded-full border border-border py-0.5 pr-1 pl-2.5"
+              >
                 {skill}
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-full px-1.5 py-0"
                   aria-label={`Remove ${skill}`}
                   onClick={() => onChange({ ...value, skills: removeSkill(value.skills, skill) })}
                 >
                   ×
-                </button>
+                </Button>
               </li>
             ))}
           </ul>

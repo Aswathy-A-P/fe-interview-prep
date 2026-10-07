@@ -1,3 +1,4 @@
+import Button from '../../../components/ui/Button.tsx';
 import { PLAN_LABELS, STEP_LABELS, type Registration, type StepId } from '../types.ts';
 
 interface ReviewStepProps {
@@ -13,17 +14,24 @@ interface ReviewSectionProps {
 
 function ReviewSection({ step, rows, onEdit }: ReviewSectionProps) {
   return (
-    <section className="wizard-review-section" aria-labelledby={`review-${step}`}>
-      <div className="wizard-review-header">
-        <h3 id={`review-${step}`}>{STEP_LABELS[step]}</h3>
-        <button type="button" aria-label={`Edit ${STEP_LABELS[step]}`} onClick={() => onEdit(step)}>
+    <section className="mb-3 border-b border-border pb-3" aria-labelledby={`review-${step}`}>
+      <div className="flex items-center justify-between gap-3">
+        <h3 id={`review-${step}`} className="my-2 text-lg font-semibold">
+          {STEP_LABELS[step]}
+        </h3>
+        <Button
+          type="button"
+          size="sm"
+          aria-label={`Edit ${STEP_LABELS[step]}`}
+          onClick={() => onEdit(step)}
+        >
           Edit
-        </button>
+        </Button>
       </div>
       <dl>
         {rows.map(([label, value]) => (
-          <div key={label} className="wizard-review-row">
-            <dt>{label}</dt>
+          <div key={label} className="flex gap-4">
+            <dt className="min-w-28 text-muted">{label}</dt>
             <dd>{value}</dd>
           </div>
         ))}

@@ -1,3 +1,4 @@
+import { fieldClass } from '../../../components/ui/fieldStyles.ts';
 import TextField from '../TextField.tsx';
 import { COUNTRIES, type Address, type FieldErrors } from '../types.ts';
 
@@ -10,11 +11,12 @@ interface AddressStepProps {
 function AddressStep({ value, errors, onChange }: AddressStepProps) {
   return (
     <>
-      <div className="wizard-field">
+      <div className="mb-4 flex flex-col gap-1">
         <label htmlFor="country">Country</label>
         <select
           id="country"
           value={value.country}
+          className={fieldClass}
           aria-invalid={errors.country ? true : undefined}
           aria-describedby={errors.country ? 'country-error' : undefined}
           onChange={(event) => onChange({ ...value, country: event.target.value })}
@@ -27,7 +29,7 @@ function AddressStep({ value, errors, onChange }: AddressStepProps) {
           ))}
         </select>
         {errors.country && (
-          <p id="country-error" className="error">
+          <p id="country-error" className="text-sm text-danger">
             {errors.country}
           </p>
         )}
