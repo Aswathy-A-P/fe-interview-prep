@@ -16,8 +16,11 @@ function App() {
   return (
     <div className="min-h-screen bg-linear-to-b from-white to-surface">
       <header className="sticky top-0 z-20 border-b border-border bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-3 px-6 py-4">
-          <NavLink to="/" className="text-lg font-bold tracking-tight text-ink">
+        <div className="mx-auto grid max-w-7xl items-center gap-x-6 gap-y-3 px-6 py-4 lg:grid-cols-[1fr_auto_1fr]">
+          <NavLink
+            to="/"
+            className="justify-self-start text-lg font-bold tracking-tight whitespace-nowrap text-ink"
+          >
             FE Interview Prep
           </NavLink>
           <nav aria-label="Questions" className="flex flex-wrap justify-center gap-1">
@@ -36,6 +39,7 @@ function App() {
               </NavLink>
             ))}
           </nav>
+          <div aria-hidden="true" className="hidden lg:block" />
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-6 py-10 sm:py-12">
