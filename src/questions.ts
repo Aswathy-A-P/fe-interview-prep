@@ -4,4 +4,7 @@ export interface Question {
   path: string;
 }
 
-export const questions: Question[] = [{ number: 1, title: 'Todo App', path: '/todo' }];
+export const questions: Question[] = [
+  { number: 1, title: 'Todo App', path: '/todo' },
+  { number: 5, title: 'Login & Session Handling', path: '/account' },
+];
