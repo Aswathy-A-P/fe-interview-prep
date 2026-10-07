@@ -1,5 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import Button from '../../components/ui/Button.tsx';
+import { cardClass, fieldClass } from '../../components/ui/fieldStyles.ts';
+import { cn } from '../../lib/cn.ts';
 import { errorMessage } from './apiClient.ts';
 import { useAuth } from './authContext.ts';
 import { redirectPath } from './redirect.ts';
@@ -34,12 +37,13 @@ function LoginPage() {
   };
 
   return (
-    <section className="auth-card">
-      <h1>Log in</h1>
-      <form onSubmit={submit} className="auth-form">
-        <label>
+    <section className="max-w-90">
+      <h1 className="mb-3 text-2xl font-semibold">Log in</h1>
+      <form onSubmit={submit} className="flex flex-col gap-3">
+        <label className="flex flex-col gap-1">
           Email
           <input
+            className={fieldClass}
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -47,9 +51,10 @@ function LoginPage() {
             required
           />
         </label>
-        <label>
+        <label className="flex flex-col gap-1">
           Password
           <input
+            className={fieldClass}
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
@@ -58,31 +63,32 @@ function LoginPage() {
           />
         </label>
         {error && (
-          <p className="error" role="alert">
+          <p className="text-danger" role="alert">
             {error}
           </p>
         )}
-        <button type="submit" className="primary" disabled={submitting}>
+        <Button type="submit" variant="primary" disabled={submitting}>
           {submitting ? 'Logging in…' : 'Log in'}
-        </button>
+        </Button>
       </form>
 
-      <div className="auth-demo">
-        <p className="muted">Demo accounts</p>
-        <ul>
+      <div className={cn(cardClass, 'mt-6 px-4 py-3')}>
+        <p className="mb-2 text-muted">Demo accounts</p>
+        <ul className="list-disc space-y-1.5 pl-4">
           {DEMO_ACCOUNTS.map((account) => (
             <li key={account.email}>
               <strong>{account.label}:</strong> <code>{account.email}</code> /{' '}
               <code>{account.password}</code>{' '}
-              <button
+              <Button
                 type="button"
+                size="sm"
                 onClick={() => {
                   setEmail(account.email);
                   setPassword(account.password);
                 }}
               >
                 Use
-              </button>
+              </Button>
             </li>
           ))}
         </ul>

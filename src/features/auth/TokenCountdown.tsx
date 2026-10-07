@@ -13,7 +13,7 @@ function TokenCountdown() {
   const secondsLeft = expiresAt === null ? 0 : Math.floor((expiresAt - now) / 1000);
 
   return (
-    <p className="muted" aria-live="off">
+    <p className="my-2 text-sm text-muted tabular-nums" aria-live="off">
       {secondsLeft > 0
         ? `Access token expires in ${secondsLeft}s`
         : 'Access token expired: the next request refreshes it silently'}

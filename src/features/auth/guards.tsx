@@ -18,8 +18,8 @@ export function RequireRole({ role }: { role: Role }) {
   if (user?.role !== role) {
     return (
       <section>
-        <h1>Access denied</h1>
-        <p className="error">This page is only available to {role}s.</p>
+        <h1 className="mb-3 text-2xl font-semibold">Access denied</h1>
+        <p className="text-danger">This page is only available to {role}s.</p>
       </section>
     );
   }

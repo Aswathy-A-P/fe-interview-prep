@@ -51,7 +51,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
 
   if (state.status === 'restoring') {
     return (
-      <p className="muted" role="status">
+      <p className="text-muted" role="status">
         Restoring session…
       </p>
     );

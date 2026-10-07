@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import AuthProvider from './AuthProvider.tsx';
 import { useAuth } from './authContext.ts';
-import './auth.css';
+import Button from '../../components/ui/Button.tsx';
 
 function SessionNav() {
   const { user, logout } = useAuth();
@@ -9,21 +9,35 @@ function SessionNav() {
 
   if (!user) {
     return (
-      <nav className="auth-nav" aria-label="Session">
-        <span className="muted">Not logged in</span>
-        <NavLink to="/login">Log in</NavLink>
+      <nav
+        className="flex flex-wrap items-center gap-3 border-b border-border pb-3 mb-4"
+        aria-label="Session"
+      >
+        <span className="text-muted">Not logged in</span>
+        <NavLink to="/login" className="text-accent hover:underline">
+          Log in
+        </NavLink>
       </nav>
     );
   }
 
   return (
-    <nav className="auth-nav" aria-label="Session">
-      <NavLink to="/account">Account</NavLink>
-      {user.role === 'admin' && <NavLink to="/admin">Admin</NavLink>}
-      <span className="auth-nav-user muted">
+    <nav
+      className="flex flex-wrap items-center gap-3 border-b border-border pb-3 mb-4"
+      aria-label="Session"
+    >
+      <NavLink to="/account" className="text-accent hover:underline">
+        Account
+      </NavLink>
+      {user.role === 'admin' && (
+        <NavLink to="/admin" className="text-accent hover:underline">
+          Admin
+        </NavLink>
+      )}
+      <span className="ml-auto text-muted">
         Signed in as {user.name} ({user.role})
       </span>
-      <button
+      <Button
         type="button"
         onClick={() => {
           logout();
@@ -31,7 +45,7 @@ function SessionNav() {
         }}
       >
         Log out
-      </button>
+      </Button>
     </nav>
   );
 }
@@ -39,7 +53,7 @@ function SessionNav() {
 function AuthLayout() {
   return (
     <AuthProvider>
-      <div className="auth">
+      <div className="max-w-160">
         <SessionNav />
         <Outlet />
       </div>
