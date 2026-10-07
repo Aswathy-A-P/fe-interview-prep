@@ -1,4 +1,7 @@
 import { useState, type FormEvent } from 'react';
+import Button from '../../components/ui/Button.tsx';
+import { cardClass } from '../../components/ui/fieldStyles.ts';
+import { cn } from '../../lib/cn.ts';
 import { usePersistentState } from '../../hooks/usePersistentState.ts';
 import { submitRegistration, type SubmitRegistration } from './api.ts';
 import ProgressIndicator from './ProgressIndicator.tsx';
@@ -21,7 +24,6 @@ import {
   validatePreferences,
   validateStep,
 } from './validation.ts';
-import './wizard.css';
 
 export const DATA_KEY = 'q3.data';
 export const STEP_KEY = 'q3.step';
@@ -84,15 +86,15 @@ function WizardPage({ submit = submitRegistration }: WizardPageProps) {
 
   if (status === 'success') {
     return (
-      <section className="wizard">
-        <h1>Registration Wizard</h1>
-        <div role="status" className="wizard-success">
-          <h2>You're registered!</h2>
+      <section className="max-w-140">
+        <h1 className="mb-4 text-3xl font-bold">Registration Wizard</h1>
+        <div role="status" className={cn(cardClass, 'mb-4 px-5 py-4')}>
+          <h2 className="mb-2 text-xl font-semibold">You're registered!</h2>
           <p>Thanks, {registeredName}. We've received your registration.</p>
         </div>
-        <button type="button" onClick={() => setStatus('idle')}>
+        <Button type="button" onClick={() => setStatus('idle')}>
           Start a new registration
-        </button>
+        </Button>
       </section>
     );
   }
@@ -100,12 +102,12 @@ function WizardPage({ submit = submitRegistration }: WizardPageProps) {
   const submitting = status === 'submitting';
 
   return (
-    <section className="wizard">
-      <h1>Registration Wizard</h1>
+    <section className="max-w-140">
+      <h1 className="mb-4 text-3xl font-bold">Registration Wizard</h1>
       <ProgressIndicator current={step} />
 
-      <form className="wizard-form" noValidate onSubmit={handleSubmit}>
-        <h2>{STEP_LABELS[step]}</h2>
+      <form className={cn(cardClass, 'px-5 py-4')} noValidate onSubmit={handleSubmit}>
+        <h2 className="mb-4 text-xl font-semibold">{STEP_LABELS[step]}</h2>
 
         {step === 'personal' && (
           <PersonalStep
@@ -131,20 +133,20 @@ function WizardPage({ submit = submitRegistration }: WizardPageProps) {
         {step === 'review' && <ReviewStep data={data} onEdit={goTo} />}
 
         {status === 'error' && (
-          <p role="alert" className="error">
+          <p role="alert" className="mb-4 text-sm text-danger">
             Something went wrong. Please try again.
           </p>
         )}
 
-        <div className="wizard-actions">
+        <div className="flex items-center justify-end gap-3">
           {step !== 'personal' && (
-            <button type="button" disabled={submitting} onClick={() => goTo(previousStep(step))}>
+            <Button type="button" disabled={submitting} onClick={() => goTo(previousStep(step))}>
               Back
-            </button>
+            </Button>
           )}
-          <button type="submit" className="primary" disabled={submitting}>
+          <Button type="submit" variant="primary" disabled={submitting}>
             {step === 'review' ? (submitting ? 'Submitting…' : 'Submit') : 'Next'}
-          </button>
+          </Button>
         </div>
       </form>
     </section>

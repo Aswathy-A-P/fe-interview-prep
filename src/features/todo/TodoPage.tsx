@@ -1,5 +1,8 @@
 import { useState, type FormEvent } from 'react';
+import Button from '../../components/ui/Button.tsx';
+import { cardClass, fieldClass } from '../../components/ui/fieldStyles.ts';
 import { usePersistentState } from '../../hooks/usePersistentState.ts';
+import { cn } from '../../lib/cn.ts';
 import TodoItem from './TodoItem.tsx';
 import {
   FILTERS,
@@ -15,7 +18,6 @@ import {
   type Filter,
   type Todo,
 } from './todos.ts';
-import './todo.css';
 
 export const TODOS_KEY = 'q1.todos';
 export const FILTER_KEY = 'q1.filter';
@@ -42,40 +44,41 @@ function TodoPage() {
   };
 
   return (
-    <section className="todo">
-      <h1>Todo App</h1>
-      <form onSubmit={submit} className="todo-add">
+    <section className="max-w-[560px]">
+      <h1 className="mb-4 text-3xl font-bold">Todo App</h1>
+      <form onSubmit={submit} className="flex items-center gap-2">
         <input
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           placeholder="What needs to be done?"
           aria-label="New todo"
+          className={cn(fieldClass, 'flex-1')}
         />
-        <button type="submit" className="primary">
+        <Button type="submit" variant="primary">
           Add
-        </button>
+        </Button>
       </form>
 
-      <div className="todo-filters" role="group" aria-label="Filter todos">
+      <div className="my-4 flex items-center gap-2" role="group" aria-label="Filter todos">
         {FILTERS.map((option) => (
-          <button
+          <Button
             key={option}
             type="button"
             aria-pressed={filter === option}
-            className={filter === option ? 'primary' : undefined}
+            variant={filter === option ? 'primary' : 'default'}
             onClick={() => setFilter(option)}
           >
             {FILTER_LABELS[option]}
-          </button>
+          </Button>
         ))}
       </div>
 
       {shown.length === 0 ? (
-        <p className="muted">
+        <p className="text-muted">
           {todos.length === 0 ? 'Nothing to do yet.' : 'No todos match this filter.'}
         </p>
       ) : (
-        <ul className="todo-list">
+        <ul className={cn(cardClass, 'm-0 list-none p-0')}>
           {shown.map((todo) => (
             <TodoItem
               key={todo.id}
@@ -88,13 +91,13 @@ function TodoPage() {
         </ul>
       )}
 
-      <footer className="todo-footer">
+      <footer className="mt-4 flex items-center justify-between gap-2">
         <span>
           {itemsLeft} {itemsLeft === 1 ? 'item' : 'items'} left
         </span>
-        <button type="button" onClick={() => setTodos(clearCompleted)} disabled={!hasCompleted}>
+        <Button type="button" onClick={() => setTodos(clearCompleted)} disabled={!hasCompleted}>
           Clear completed
-        </button>
+        </Button>
       </footer>
     </section>
   );

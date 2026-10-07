@@ -1,3 +1,5 @@
+import Button from '../ui/Button.tsx';
+import { fieldClass } from '../ui/fieldStyles.ts';
 import { PAGE_SIZES, isPageSize, type PageSize } from './tableUtils.ts';
 
 interface PaginationProps {
@@ -16,10 +18,14 @@ function Pagination({
   onPageSizeChange,
 }: PaginationProps) {
   return (
-    <nav className="pagination" aria-label="Pagination">
+    <nav
+      className="mt-4 flex flex-wrap items-center justify-end gap-3 text-sm"
+      aria-label="Pagination"
+    >
       <label>
         Rows per page{' '}
         <select
+          className={fieldClass}
           value={pageSize}
           onChange={(event) => {
             const size = Number(event.target.value);
@@ -33,15 +39,15 @@ function Pagination({
           ))}
         </select>
       </label>
-      <button type="button" onClick={() => onPageChange(page - 1)} disabled={page <= 1}>
+      <Button size="sm" onClick={() => onPageChange(page - 1)} disabled={page <= 1}>
         Previous
-      </button>
+      </Button>
       <span>
         Page {page} of {totalPages}
       </span>
-      <button type="button" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages}>
+      <Button size="sm" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages}>
         Next
-      </button>
+      </Button>
     </nav>
   );
 }

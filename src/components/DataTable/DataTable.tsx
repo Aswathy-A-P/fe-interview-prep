@@ -1,5 +1,6 @@
 import { nextSort, type Column, type SortState } from './tableUtils.ts';
-import './DataTable.css';
+import { cn } from '../../lib/cn.ts';
+import { cardClass } from '../ui/fieldStyles.ts';
 
 interface DataTableProps<T> {
   rows: T[];
@@ -13,6 +14,7 @@ interface DataTableProps<T> {
 
 const ARIA_SORT = { asc: 'ascending', desc: 'descending' } as const;
 const SORT_ICON = { asc: '▲', desc: '▼' } as const;
+const CELL = 'border-b border-border px-3 py-2 text-left align-top';
 
 function DataTable<T>({
   rows,
@@ -24,8 +26,8 @@ function DataTable<T>({
   emptyMessage = 'No rows to show.',
 }: DataTableProps<T>) {
   return (
-    <table className="data-table">
-      {caption && <caption>{caption}</caption>}
+    <table className={cn(cardClass, 'w-full border-collapse rounded-none text-sm')}>
+      {caption && <caption className="pb-2 text-left text-muted">{caption}</caption>}
       <thead>
         <tr>
           {columns.map((column) => {
@@ -35,11 +37,22 @@ function DataTable<T>({
                 key={column.id}
                 scope="col"
                 aria-sort={direction ? ARIA_SORT[direction] : undefined}
+                className="border-b border-border bg-surface px-3 py-2 text-left align-top font-semibold whitespace-nowrap"
               >
                 {column.sortable ? (
-                  <button type="button" onClick={() => onSortChange(nextSort(sort, column.id))}>
+                  <button
+                    type="button"
+                    onClick={() => onSortChange(nextSort(sort, column.id))}
+                    className={cn(
+                      'inline-flex cursor-pointer items-center gap-1.5 rounded-sm font-[inherit] hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+                      direction && 'text-accent',
+                    )}
+                  >
                     {column.header}
-                    <span aria-hidden="true" className="sort-icon">
+                    <span
+                      aria-hidden="true"
+                      className={cn('text-[0.75em]', direction ? 'text-accent' : 'text-muted')}
+                    >
                       {direction ? SORT_ICON[direction] : '↕'}
                     </span>
                   </button>
@@ -54,15 +67,17 @@ function DataTable<T>({
       <tbody>
         {rows.length === 0 ? (
           <tr>
-            <td colSpan={columns.length} className="muted">
+            <td colSpan={columns.length} className={cn(CELL, 'text-muted')}>
               {emptyMessage}
             </td>
           </tr>
         ) : (
           rows.map((row) => (
-            <tr key={getRowId(row)}>
+            <tr key={getRowId(row)} className="even:bg-surface/50 hover:bg-accent/5">
               {columns.map((column) => (
-                <td key={column.id}>{column.render ? column.render(row) : column.accessor(row)}</td>
+                <td key={column.id} className={CELL}>
+                  {column.render ? column.render(row) : column.accessor(row)}
+                </td>
               ))}
             </tr>
           ))

@@ -1,3 +1,6 @@
+import Button from '../../components/ui/Button.tsx';
+import { cardClass } from '../../components/ui/fieldStyles.ts';
+import { cn } from '../../lib/cn.ts';
 import Highlight from './Highlight.tsx';
 import type { SearchState } from './useProductSearch.ts';
 
@@ -12,35 +15,38 @@ const priceFormat = new Intl.NumberFormat('en-US', { style: 'currency', currency
 function SearchResults({ state, query, onRetry }: SearchResultsProps) {
   switch (state.status) {
     case 'idle':
-      return <p className="muted">Start typing to search products.</p>;
+      return <p className="text-muted">Start typing to search products.</p>;
     case 'loading':
       return (
-        <p role="status" className="muted">
+        <p role="status" className="text-muted">
           Loading…
         </p>
       );
     case 'error':
       return (
-        <div role="alert" className="search-error">
-          <p className="error">Could not load results: {state.message}</p>
-          <button type="button" className="primary" onClick={onRetry}>
+        <div role="alert" className="flex items-center gap-3">
+          <p className="text-danger">Could not load results: {state.message}</p>
+          <Button variant="primary" onClick={onRetry}>
             Retry
-          </button>
+          </Button>
         </div>
       );
     case 'success':
       if (state.products.length === 0) {
-        return <p className="muted">No results for '{query}'</p>;
+        return <p className="text-muted">No results for '{query}'</p>;
       }
       return (
-        <ul className="search-results" aria-label="Search results">
+        <ul className={cn(cardClass, 'm-0 list-none p-0')} aria-label="Search results">
           {state.products.map((product) => (
-            <li key={product.id} className="search-result">
+            <li
+              key={product.id}
+              className="flex items-center justify-between gap-4 border-b border-border px-3 py-2 last:border-b-0"
+            >
               <div>
-                <div className="search-title">
+                <div className="font-semibold">
                   <Highlight text={product.title} query={query} />
                 </div>
-                <div className="muted">
+                <div className="text-muted">
                   {product.brand && (
                     <>
                       <Highlight text={product.brand} query={query} /> ·{' '}
@@ -49,7 +55,7 @@ function SearchResults({ state, query, onRetry }: SearchResultsProps) {
                   {product.category}
                 </div>
               </div>
-              <span className="search-price">{priceFormat.format(product.price)}</span>
+              <span className="whitespace-nowrap">{priceFormat.format(product.price)}</span>
             </li>
           ))}
         </ul>
