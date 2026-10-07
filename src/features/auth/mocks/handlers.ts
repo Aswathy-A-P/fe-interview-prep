@@ -8,19 +8,17 @@ import type {
   User,
 } from '../types.ts';
 import { MOCK_ORDERS, MOCK_USERS } from './data.ts';
+import { createTokenTable, type TokenTable } from './tokenTable.ts';
 
 export const ACCESS_TOKEN_TTL_MS = 30_000;
 export const REFRESH_TOKEN_TTL_MS = 10 * 60_000;
+export const MOCK_REFRESH_TOKENS_KEY = 'q5.mockBackend.refreshTokens';
 
 export interface MockBackendOptions {
   now?: () => number;
   accessTokenTtlMs?: number;
   refreshTokenTtlMs?: number;
-}
-
-interface TokenRecord {
-  userId: string;
-  expiresAt: number;
+  storage?: Storage;
 }
 
 function toPublicUser({ id, name, email, role }: User): User {
@@ -35,11 +33,12 @@ export function createAuthHandlers({
   now = Date.now,
   accessTokenTtlMs = ACCESS_TOKEN_TTL_MS,
   refreshTokenTtlMs = REFRESH_TOKEN_TTL_MS,
+  storage,
 }: MockBackendOptions = {}) {
-  const accessTokens = new Map<string, TokenRecord>();
-  const refreshTokens = new Map<string, TokenRecord>();
+  const accessTokens = createTokenTable();
+  const refreshTokens = createTokenTable(storage && { key: MOCK_REFRESH_TOKENS_KEY, storage });
 
-  const issueToken = (store: Map<string, TokenRecord>, userId: string, ttlMs: number) => {
+  const issueToken = (store: TokenTable, userId: string, ttlMs: number) => {
     const token = crypto.randomUUID();
     store.set(token, { userId, expiresAt: now() + ttlMs });
     return token;
@@ -50,7 +49,7 @@ export function createAuthHandlers({
     expiresIn: accessTokenTtlMs / 1000,
   });
 
-  const findUser = (store: Map<string, TokenRecord>, token: string | null | undefined) => {
+  const findUser = (store: TokenTable, token: string | null | undefined) => {
     const record = token ? store.get(token) : undefined;
     if (!record || record.expiresAt <= now()) return undefined;
     return MOCK_USERS.find((user) => user.id === record.userId);
@@ -63,7 +62,7 @@ export function createAuthHandlers({
   };
 
   const activeSessions = () =>
-    [...refreshTokens.values()].filter((record) => record.expiresAt > now()).length;
+    refreshTokens.records().filter((record) => record.expiresAt > now()).length;
 
   return [
     http.post<PathParams, Credentials>('/api/auth/login', async ({ request }) => {
