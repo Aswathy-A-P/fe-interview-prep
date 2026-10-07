@@ -26,7 +26,7 @@ function AdminPage() {
 
   return (
     <section>
-      <h1 className="mb-3 text-2xl font-semibold">Admin stats</h1>
+      <h1 className="mb-4 text-3xl font-bold">Admin stats</h1>
       {error && <p className="text-danger">{error}</p>}
       {!stats && !error && <p className="text-muted">Loading stats…</p>}
       {stats && (

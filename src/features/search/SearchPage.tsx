@@ -14,7 +14,7 @@ function SearchPage() {
 
   return (
     <section className="max-w-160">
-      <h1 className="mb-4 text-2xl font-bold">Live Search</h1>
+      <h1 className="mb-4 text-3xl font-bold">Live Search</h1>
       <label htmlFor="search-input" className="mb-1 block font-semibold">
         Search products
       </label>

@@ -45,7 +45,7 @@ function TodoPage() {
 
   return (
     <section className="max-w-[560px]">
-      <h1 className="mb-4 text-2xl font-semibold">Todo App</h1>
+      <h1 className="mb-4 text-3xl font-bold">Todo App</h1>
       <form onSubmit={submit} className="flex items-center gap-2">
         <input
           value={title}

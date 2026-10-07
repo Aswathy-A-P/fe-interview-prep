@@ -38,7 +38,7 @@ function LoginPage() {
 
   return (
     <section className="max-w-90">
-      <h1 className="mb-3 text-2xl font-semibold">Log in</h1>
+      <h1 className="mb-4 text-3xl font-bold">Log in</h1>
       <form onSubmit={submit} className="flex flex-col gap-3">
         <label className="flex flex-col gap-1">
           Email

@@ -48,7 +48,7 @@ function AccountPage() {
 
   return (
     <section>
-      <h1 className="mb-3 text-2xl font-semibold">Account</h1>
+      <h1 className="mb-4 text-3xl font-bold">Account</h1>
       <dl className={detailsClass}>
         <dt>Name</dt>
         <dd>{user.name}</dd>
