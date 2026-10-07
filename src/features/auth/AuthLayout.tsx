@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import Button from '../../components/ui/Button.tsx';
 import AuthProvider from './AuthProvider.tsx';
 import { useAuth } from './authContext.ts';
-import Button from '../../components/ui/Button.tsx';
+import { idleSettings } from './idleSettings.ts';
+import IdleWarning from './IdleWarning.tsx';
 
 function SessionNav() {
   const { user, logout } = useAuth();
@@ -50,11 +53,20 @@ function SessionNav() {
   );
 }
 
+function SessionIdleWarning() {
+  const { status, logout } = useAuth();
+  const [settings] = useState(() => idleSettings(window.location.search, import.meta.env.DEV));
+
+  if (status !== 'authenticated') return null;
+  return <IdleWarning {...settings} onLogout={logout} />;
+}
+
 function AuthLayout() {
   return (
     <AuthProvider>
       <div className="max-w-160">
         <SessionNav />
+        <SessionIdleWarning />
         <Outlet />
       </div>
     </AuthProvider>

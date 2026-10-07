@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { onSessionExpired } from './apiClient.ts';
 import { AuthContext, type AuthState } from './authContext.ts';
 import { requestLogin, restoreSession } from './authApi.ts';
+import { connectSessionSync, type ConnectSessionSync, type SessionSync } from './sessionSync.ts';
 import { clearTokens, getRefreshToken, setAccessToken, setRefreshToken } from './tokenStore.ts';
 import type { Credentials } from './types.ts';
 
@@ -11,11 +12,40 @@ function initialState(): AuthState {
   return getRefreshToken() ? { status: 'restoring', user: null } : ANONYMOUS;
 }
 
-function AuthProvider({ children }: { children: ReactNode }) {
+interface AuthProviderProps {
+  children: ReactNode;
+  connectSync?: ConnectSessionSync;
+}
+
+function AuthProvider({ children, connectSync = connectSessionSync }: AuthProviderProps) {
   const [state, setState] = useState<AuthState>(initialState);
+  const syncRef = useRef<SessionSync | null>(null);
 
   useEffect(() => {
-    onSessionExpired(() => setState(ANONYMOUS));
+    const sync = connectSync((message) => {
+      if (message.type === 'logout') {
+        clearTokens();
+        setState(ANONYMOUS);
+        return;
+      }
+      if (!getRefreshToken()) return;
+      restoreSession().then(
+        (user) => setState({ status: 'authenticated', user }),
+        () => setState(ANONYMOUS),
+      );
+    });
+    syncRef.current = sync;
+    return () => {
+      syncRef.current = null;
+      sync.close();
+    };
+  }, [connectSync]);
+
+  useEffect(() => {
+    onSessionExpired(() => {
+      setState(ANONYMOUS);
+      syncRef.current?.post({ type: 'logout' });
+    });
     return () => onSessionExpired(null);
   }, []);
 
@@ -40,11 +70,13 @@ function AuthProvider({ children }: { children: ReactNode }) {
     setAccessToken(accessToken, expiresIn);
     setRefreshToken(refreshToken);
     setState({ status: 'authenticated', user });
+    syncRef.current?.post({ type: 'login' });
   }, []);
 
   const logout = useCallback(() => {
     clearTokens();
     setState(ANONYMOUS);
+    syncRef.current?.post({ type: 'logout' });
   }, []);
 
   const value = useMemo(() => ({ ...state, login, logout }), [state, login, logout]);
