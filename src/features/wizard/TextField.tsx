@@ -1,4 +1,5 @@
 import { fieldClass } from '../../components/ui/fieldStyles.ts';
+import { cn } from '../../lib/cn.ts';
 
 interface TextFieldProps {
   id: string;
@@ -21,14 +22,17 @@ function TextField({
 }: TextFieldProps) {
   const errorId = `${id}-error`;
   return (
-    <div className="mb-4 flex flex-col gap-1">
-      <label htmlFor={id}>{label}</label>
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={id} className="text-sm font-medium text-ink">
+        {label}
+      </label>
       <input
         id={id}
         type={type}
         value={value}
         autoComplete={autoComplete}
-        className={fieldClass}
+        className={cn(fieldClass, 'w-full')}
+        aria-required="true"
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         onChange={(event) => onChange(event.target.value)}

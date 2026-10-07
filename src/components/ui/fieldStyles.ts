@@ -1,4 +1,4 @@
 export const fieldClass =
-  'rounded-md border border-border bg-white px-2 py-1.5 text-ink placeholder:text-muted focus:outline-2 focus:outline-offset-1 focus:outline-accent aria-invalid:border-danger aria-invalid:outline-danger';
+  'rounded-lg border border-border bg-white px-3 py-2 text-ink shadow-xs placeholder:text-muted focus:border-accent focus:outline-2 focus:outline-offset-0 focus:outline-accent/30 aria-invalid:border-danger aria-invalid:outline-danger/30';
 
-export const cardClass = 'rounded-lg border border-border bg-white';
+export const cardClass = 'rounded-xl border border-border bg-white shadow-sm';

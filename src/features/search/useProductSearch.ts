@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { searchProducts, type Product } from './api.ts';
+import { searchCache } from './searchCache.ts';
 
 export type SearchState =
   | { status: 'idle' }
@@ -18,9 +19,10 @@ interface SettledRequest {
 export function useProductSearch(query: string): { state: SearchState; retry: () => void } {
   const [attempt, setAttempt] = useState(0);
   const [settled, setSettled] = useState<SettledRequest | null>(null);
+  const cached = query === '' ? undefined : searchCache.get(query);
 
   useEffect(() => {
-    if (query === '') {
+    if (query === '' || searchCache.get(query)) {
       return;
     }
     const controller = new AbortController();
@@ -31,7 +33,10 @@ export function useProductSearch(query: string): { state: SearchState; retry: ()
     };
 
     searchProducts(query, controller.signal)
-      .then((products) => finish({ status: 'success', products }))
+      .then((products) => {
+        searchCache.set(query, products);
+        finish({ status: 'success', products });
+      })
       .catch((error: unknown) =>
         finish({
           status: 'error',
@@ -46,6 +51,9 @@ export function useProductSearch(query: string): { state: SearchState; retry: ()
 
   if (query === '') {
     return { state: { status: 'idle' }, retry };
+  }
+  if (cached) {
+    return { state: { status: 'success', products: cached }, retry };
   }
   if (settled === null || settled.query !== query || settled.attempt !== attempt) {
     return { state: { status: 'loading' }, retry };

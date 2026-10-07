@@ -42,6 +42,48 @@ describe('WizardPage', () => {
     expect(screen.queryByText('Name is required.')).not.toBeInTheDocument();
   });
 
+  it('focuses the first invalid field and links it to its inline error', async () => {
+    const user = userEvent.setup();
+    render(<WizardPage />);
+
+    await next(user);
+    const name = screen.getByLabelText('Full name');
+    expect(name).toHaveFocus();
+    expect(name).toHaveAccessibleDescription('Name is required.');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    await user.type(name, 'Asha');
+    await next(user);
+    const email = screen.getByLabelText('Email');
+    expect(email).toHaveFocus();
+    expect(email).toHaveAccessibleDescription('Email is required.');
+  });
+
+  it('marks the plan group invalid and focuses its first radio', async () => {
+    const user = userEvent.setup();
+    render(<WizardPage />);
+    await fillPersonal(user);
+    await next(user);
+    await fillAddress(user);
+    await next(user);
+
+    await next(user);
+    expect(screen.getByRole('radiogroup', { name: 'Plan' })).toHaveAccessibleDescription(
+      'Choose a plan.',
+    );
+    expect(screen.getByLabelText('Free')).toHaveFocus();
+  });
+
+  it('moves focus to the step heading after a successful Next', async () => {
+    const user = userEvent.setup();
+    render(<WizardPage />);
+    await fillPersonal(user);
+    await next(user);
+
+    expect(screen.getByRole('heading', { name: 'Address' })).toHaveFocus();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
   it('requires a 6-digit postal code for India', async () => {
     const user = userEvent.setup();
     render(<WizardPage />);

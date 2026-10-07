@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import Button from '../../components/ui/Button.tsx';
+import Page from '../../components/ui/Page.tsx';
 import { cardClass, fieldClass } from '../../components/ui/fieldStyles.ts';
 import { cn } from '../../lib/cn.ts';
 import { errorMessage } from './apiClient.ts';
@@ -11,6 +12,8 @@ const DEMO_ACCOUNTS = [
   { label: 'Admin', email: 'admin@example.com', password: 'admin123' },
   { label: 'User', email: 'user@example.com', password: 'user123' },
 ];
+
+const labelClass = 'flex flex-col gap-1.5 text-sm font-medium text-ink';
 
 function LoginPage() {
   const { status, login } = useAuth();
@@ -37,13 +40,12 @@ function LoginPage() {
   };
 
   return (
-    <section className="max-w-90">
-      <h1 className="mb-4 text-3xl font-bold">Log in</h1>
-      <form onSubmit={submit} className="flex flex-col gap-3">
-        <label className="flex flex-col gap-1">
+    <Page title="Log in" description="Sign in to view your account and orders." width="sm">
+      <form onSubmit={submit} className={cn(cardClass, 'space-y-5 p-6 sm:p-8')}>
+        <label className={labelClass}>
           Email
           <input
-            className={fieldClass}
+            className={cn(fieldClass, 'w-full font-normal')}
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -51,10 +53,10 @@ function LoginPage() {
             required
           />
         </label>
-        <label className="flex flex-col gap-1">
+        <label className={labelClass}>
           Password
           <input
-            className={fieldClass}
+            className={cn(fieldClass, 'w-full font-normal')}
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
@@ -63,22 +65,30 @@ function LoginPage() {
           />
         </label>
         {error && (
-          <p className="text-danger" role="alert">
+          <p
+            className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
+            role="alert"
+          >
             {error}
           </p>
         )}
-        <Button type="submit" variant="primary" disabled={submitting}>
+        <Button type="submit" variant="primary" className="w-full" disabled={submitting}>
           {submitting ? 'Logging in…' : 'Log in'}
         </Button>
       </form>
 
-      <div className={cn(cardClass, 'mt-6 px-4 py-3')}>
-        <p className="mb-2 text-muted">Demo accounts</p>
-        <ul className="list-disc space-y-1.5 pl-4">
+      <div className={cn(cardClass, 'space-y-3 p-5')}>
+        <p className="text-xs font-semibold tracking-wide text-muted uppercase">Demo accounts</p>
+        <ul className="divide-y divide-border">
           {DEMO_ACCOUNTS.map((account) => (
-            <li key={account.email}>
-              <strong>{account.label}:</strong> <code>{account.email}</code> /{' '}
-              <code>{account.password}</code>{' '}
+            <li
+              key={account.email}
+              className="flex flex-wrap items-center justify-between gap-3 py-2 text-sm"
+            >
+              <span>
+                <strong>{account.label}:</strong> <code>{account.email}</code> /{' '}
+                <code>{account.password}</code>
+              </span>
               <Button
                 type="button"
                 size="sm"
@@ -93,7 +103,7 @@ function LoginPage() {
           ))}
         </ul>
       </div>
-    </section>
+    </Page>
   );
 }
 

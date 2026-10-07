@@ -58,3 +58,13 @@ export function visibleTodos(todos: Todo[], filter: Filter): Todo[] {
 export function countActive(todos: Todo[]): number {
   return todos.filter((todo) => !todo.completed).length;
 }
+
+export function moveTodo(todos: Todo[], fromId: string, toId: string): Todo[] {
+  const from = todos.findIndex((todo) => todo.id === fromId);
+  const to = todos.findIndex((todo) => todo.id === toId);
+  if (from === -1 || to === -1 || from === to) return todos;
+  const next = [...todos];
+  const [moved] = next.splice(from, 1);
+  if (moved) next.splice(to, 0, moved);
+  return next;
+}

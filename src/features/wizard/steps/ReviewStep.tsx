@@ -14,9 +14,12 @@ interface ReviewSectionProps {
 
 function ReviewSection({ step, rows, onEdit }: ReviewSectionProps) {
   return (
-    <section className="mb-3 border-b border-border pb-3" aria-labelledby={`review-${step}`}>
+    <section
+      className="space-y-3 border-b border-border pb-5 last:border-b-0 last:pb-0"
+      aria-labelledby={`review-${step}`}
+    >
       <div className="flex items-center justify-between gap-3">
-        <h3 id={`review-${step}`} className="my-2 text-lg font-semibold">
+        <h3 id={`review-${step}`} className="text-base font-semibold text-ink">
           {STEP_LABELS[step]}
         </h3>
         <Button
@@ -28,11 +31,11 @@ function ReviewSection({ step, rows, onEdit }: ReviewSectionProps) {
           Edit
         </Button>
       </div>
-      <dl>
+      <dl className="grid grid-cols-[8rem_1fr] gap-x-4 gap-y-2 text-sm">
         {rows.map(([label, value]) => (
-          <div key={label} className="flex gap-4">
-            <dt className="min-w-28 text-muted">{label}</dt>
-            <dd>{value}</dd>
+          <div key={label} className="contents">
+            <dt className="text-muted">{label}</dt>
+            <dd className="break-words text-ink">{value}</dd>
           </div>
         ))}
       </dl>
@@ -44,7 +47,7 @@ function ReviewStep({ data, onEdit }: ReviewStepProps) {
   const { personal, address, preferences } = data;
   const plan = preferences.plan ? PLAN_LABELS[preferences.plan] : '';
   return (
-    <>
+    <div className="space-y-5">
       <ReviewSection
         step="personal"
         onEdit={onEdit}
@@ -71,7 +74,7 @@ function ReviewStep({ data, onEdit }: ReviewStepProps) {
           ['Skills', preferences.skills.join(', ')],
         ]}
       />
-    </>
+    </div>
   );
 }
 

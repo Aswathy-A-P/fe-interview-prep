@@ -113,4 +113,78 @@ describe('QuotesTablePage', () => {
     renderAt('/table');
     expect(await screen.findByRole('alert')).toHaveTextContent('Request failed with status 500');
   });
+
+  it('hides a column and keeps the page', async () => {
+    const user = userEvent.setup();
+    renderAt('/table?page=2');
+    await screen.findByText('Page 2 of 3');
+
+    await user.click(screen.getByText('Columns'));
+    await user.click(screen.getByRole('checkbox', { name: 'Author' }));
+
+    expect(screen.queryByRole('columnheader', { name: /author/i })).not.toBeInTheDocument();
+    expect(query()).toBe('?page=2&hide=author');
+    expect(screen.getByText('Page 2 of 3')).toBeInTheDocument();
+  });
+
+  it('restores hidden columns from the URL and keeps the last one visible', async () => {
+    renderAt('/table?hide=id&hide=quote&hide=author');
+    await screen.findByText('Page 1 of 3');
+
+    expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
+      'Words↕',
+    ]);
+    expect(screen.getByRole('checkbox', { name: 'Words' })).toBeDisabled();
+    expect(screen.getByRole('checkbox', { name: 'Author' })).not.toBeChecked();
+  });
+});
+
+describe('QuotesTablePage in server-side mode', () => {
+  const fetchPage = vi.fn((url: string) => {
+    const params = new URL(url).searchParams;
+    const limit = Number(params.get('limit'));
+    const skip = Number(params.get('skip'));
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ quotes: quotes.slice(skip, skip + limit), total: 30 }),
+    });
+  });
+
+  beforeEach(() => {
+    fetchPage.mockClear();
+    vi.stubGlobal('fetch', fetchPage);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const lastUrl = () => fetchPage.mock.calls.at(-1)?.[0];
+
+  it('fetches each page with limit and skip', async () => {
+    const user = userEvent.setup();
+    renderAt('/table?mode=server');
+    expect(await screen.findByText('Page 1 of 3')).toBeInTheDocument();
+    expect(lastUrl()).toBe('https://dummyjson.com/quotes?limit=10&skip=0');
+    expect(screen.getByRole('searchbox', { name: 'Search' })).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /words/i })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Next' }));
+
+    expect(lastUrl()).toBe('https://dummyjson.com/quotes?limit=10&skip=10');
+    expect(await screen.findByText('Showing 11–20 of 30 quotes')).toBeInTheDocument();
+    expect(firstIds()[0]).toBe('11');
+  });
+
+  it('requests the new limit from page 1 when the page size changes', async () => {
+    const user = userEvent.setup();
+    renderAt('/table?mode=server&page=3');
+    await screen.findByText('Page 3 of 3');
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Rows per page' }), '25');
+
+    expect(lastUrl()).toBe('https://dummyjson.com/quotes?limit=25&skip=0');
+    expect(query()).toBe('?mode=server&size=25');
+    expect(await screen.findByText('Page 1 of 2')).toBeInTheDocument();
+  });
 });
