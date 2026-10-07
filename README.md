@@ -1,2 +1,2 @@
-# interview-mock-task
+# interview-mock
 Interview mock task
