@@ -42,21 +42,21 @@ describe('WizardPage', () => {
     expect(screen.queryByText('Name is required.')).not.toBeInTheDocument();
   });
 
-  it('announces an error summary and focuses the first invalid field', async () => {
+  it('focuses the first invalid field and links it to its inline error', async () => {
     const user = userEvent.setup();
     render(<WizardPage />);
 
     await next(user);
-    expect(screen.getByRole('alert')).toHaveTextContent('3 errors');
-    expect(screen.getByLabelText('Full name')).toHaveFocus();
+    const name = screen.getByLabelText('Full name');
+    expect(name).toHaveFocus();
+    expect(name).toHaveAccessibleDescription('Name is required.');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
 
-    await user.type(screen.getByLabelText('Full name'), 'Asha');
+    await user.type(name, 'Asha');
     await next(user);
-    expect(screen.getByRole('alert')).toHaveTextContent('2 errors');
-    expect(screen.getByLabelText('Email')).toHaveFocus();
-
-    await user.click(screen.getByRole('button', { name: 'Phone: Phone is required.' }));
-    expect(screen.getByLabelText('Phone')).toHaveFocus();
+    const email = screen.getByLabelText('Email');
+    expect(email).toHaveFocus();
+    expect(email).toHaveAccessibleDescription('Email is required.');
   });
 
   it('marks the plan group invalid and focuses its first radio', async () => {

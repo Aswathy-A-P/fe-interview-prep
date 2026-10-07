@@ -6,7 +6,6 @@ import { cn } from '../../lib/cn.ts';
 import { usePersistentState } from '../../hooks/usePersistentState.ts';
 import { questions } from '../../questions.ts';
 import { submitRegistration, type SubmitRegistration } from './api.ts';
-import ErrorSummary from './ErrorSummary.tsx';
 import ProgressIndicator from './ProgressIndicator.tsx';
 import {
   emptyRegistration,
@@ -159,8 +158,6 @@ function WizardPage({ submit = submitRegistration }: WizardPageProps) {
         <h2 ref={headingRef} tabIndex={-1} className="text-xl font-semibold text-ink outline-none">
           {STEP_LABELS[step]}
         </h2>
-
-        {showErrors && <ErrorSummary key={attempt} errors={validateStep(step, data)} />}
 
         <div className="space-y-5">
           {step === 'personal' && (
