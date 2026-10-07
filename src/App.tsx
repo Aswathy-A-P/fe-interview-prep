@@ -1,4 +1,5 @@
 import { NavLink, Route, Routes } from 'react-router-dom';
+import TodoPage from './features/todo/TodoPage.tsx';
 import HomePage from './pages/HomePage.tsx';
 import { questions } from './questions.ts';
 
@@ -20,6 +21,7 @@ function App() {
       <main className="content">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/todo" element={<TodoPage />} />
           <Route path="*" element={<p>Page not found.</p>} />
         </Routes>
       </main>
