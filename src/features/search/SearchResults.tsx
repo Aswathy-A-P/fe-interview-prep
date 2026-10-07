@@ -16,6 +16,8 @@ interface SearchResultsProps {
   onRetry: () => void;
 }
 
+const stateClass = cn(cardClass, 'px-5 py-10 text-center text-muted');
+
 const priceFormat = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
 function SearchResults({
@@ -29,16 +31,19 @@ function SearchResults({
 }: SearchResultsProps) {
   switch (state.status) {
     case 'idle':
-      return <p className="text-muted">Start typing to search products.</p>;
+      return <p className={stateClass}>Start typing to search products.</p>;
     case 'loading':
       return (
-        <p aria-hidden="true" className="text-muted">
+        <p aria-hidden="true" className={stateClass}>
           Loading…
         </p>
       );
     case 'error':
       return (
-        <div role="alert" className="flex items-center gap-3">
+        <div
+          role="alert"
+          className={cn(cardClass, 'flex flex-col items-center gap-4 px-5 py-10 text-center')}
+        >
           <p className="text-danger">Could not load results: {state.message}</p>
           <Button variant="primary" onClick={onRetry}>
             Retry
@@ -47,7 +52,7 @@ function SearchResults({
       );
     case 'success':
       if (state.products.length === 0) {
-        return <p className="text-muted">No results for '{query}'</p>;
+        return <p className={stateClass}>No results for '{query}'</p>;
       }
       if (!open) {
         return null;
@@ -57,7 +62,7 @@ function SearchResults({
           id={listboxId}
           role="listbox"
           aria-label="Search results"
-          className={cn(cardClass, 'm-0 list-none p-0')}
+          className={cn(cardClass, 'm-0 list-none overflow-hidden p-0')}
         >
           {state.products.map((product, index) => (
             <li
@@ -68,15 +73,15 @@ function SearchResults({
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => onSelect(product)}
               className={cn(
-                'flex cursor-pointer items-center justify-between gap-4 border-b border-border px-3 py-2 last:border-b-0',
+                'flex cursor-pointer items-center justify-between gap-4 border-b border-border px-5 py-4 transition-colors last:border-b-0 hover:bg-accent/5',
                 index === activeIndex && 'bg-accent/10 outline-2 -outline-offset-2 outline-accent',
               )}
             >
-              <div>
-                <div className="font-semibold">
+              <div className="min-w-0 space-y-1">
+                <div className="font-semibold text-ink">
                   <Highlight text={product.title} query={query} />
                 </div>
-                <div className="text-muted">
+                <div className="text-sm text-muted">
                   {product.brand && (
                     <>
                       <Highlight text={product.brand} query={query} /> ·{' '}
@@ -85,7 +90,9 @@ function SearchResults({
                   {product.category}
                 </div>
               </div>
-              <span className="whitespace-nowrap">{priceFormat.format(product.price)}</span>
+              <span className="shrink-0 font-semibold whitespace-nowrap text-ink tabular-nums">
+                {priceFormat.format(product.price)}
+              </span>
             </li>
           ))}
         </ul>
