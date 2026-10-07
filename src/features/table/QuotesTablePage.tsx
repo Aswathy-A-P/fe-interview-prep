@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import Button from '../../components/ui/Button.tsx';
+import { fieldClass } from '../../components/ui/fieldStyles.ts';
+import { cn } from '../../lib/cn.ts';
 import DataTable from '../../components/DataTable/DataTable.tsx';
 import Pagination from '../../components/DataTable/Pagination.tsx';
 import {
@@ -11,7 +14,6 @@ import {
 } from '../../components/DataTable/tableUtils.ts';
 import { distinctAuthors, fetchQuotes, filterByAuthor, type QuoteRow } from './quotes.ts';
 import { changeView, parseView, serializeView, type TableView } from './tableView.ts';
-import './table.css';
 
 const COLUMNS: Column<QuoteRow>[] = [
   { id: 'id', header: '#', accessor: (row) => row.id, sortable: true },
@@ -77,10 +79,10 @@ function QuotesTablePage() {
   };
 
   return (
-    <section className="quotes">
-      <h1>Data Table</h1>
+    <section className="space-y-4">
+      <h1 className="text-3xl font-bold">Data Table</h1>
 
-      <div className="quotes-controls">
+      <div className="flex flex-wrap items-center gap-4">
         <label>
           Search{' '}
           <input
@@ -90,11 +92,13 @@ function QuotesTablePage() {
               setView(changeView(view, { q: event.target.value }), { replace: view.q !== '' })
             }
             placeholder="Quote or author"
+            className={cn(fieldClass, 'w-72')}
           />
         </label>
         <label>
           Author{' '}
           <select
+            className={cn(fieldClass, 'max-w-64')}
             value={view.author}
             onChange={(event) => setView(changeView(view, { author: event.target.value }))}
           >
@@ -108,20 +112,18 @@ function QuotesTablePage() {
         </label>
       </div>
 
-      {load.status === 'loading' && <p className="muted">Loading quotes…</p>}
+      {load.status === 'loading' && <p className="text-muted">Loading quotes…</p>}
 
       {load.status === 'error' && (
-        <div role="alert" className="error">
+        <div role="alert" className="space-y-2 text-danger">
           <p>Could not load quotes: {load.message}</p>
-          <button type="button" onClick={retry}>
-            Retry
-          </button>
+          <Button onClick={retry}>Retry</Button>
         </div>
       )}
 
       {load.status === 'ready' && (
         <>
-          <p className="muted" aria-live="polite">
+          <p className="text-muted" aria-live="polite">
             Showing {first}–{last} of {matchingRows.length} quotes
           </p>
           <DataTable
