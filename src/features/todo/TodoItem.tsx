@@ -68,7 +68,7 @@ function TodoItem({
       onDrop={drop}
       onDragEnd={onDragEnd}
       className={cn(
-        'flex items-center gap-2 border-b border-border px-3 py-2 last:border-b-0',
+        'flex items-center gap-3 bg-white px-4 py-3 transition-colors',
         !isEditing && 'cursor-grab',
         isDropTarget && 'bg-accent/10 outline-2 -outline-offset-2 outline-accent outline-dashed',
       )}
@@ -78,26 +78,32 @@ function TodoItem({
         checked={todo.completed}
         onChange={() => onToggle(todo.id)}
         aria-label={`Mark "${todo.title}" as ${todo.completed ? 'active' : 'completed'}`}
+        className="size-4 shrink-0 cursor-pointer accent-accent"
       />
       {isEditing ? (
-        <form onSubmit={save} className="flex flex-1 items-center gap-2">
+        <form onSubmit={save} className="flex min-w-0 flex-1 items-center gap-3">
           <input
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={cancelOnEscape}
             aria-label={`Edit "${todo.title}"`}
-            className={cn(fieldClass, 'flex-1')}
+            className={cn(fieldClass, 'min-w-0 flex-1 py-1.5')}
             autoFocus
           />
-          <Button type="submit">Save</Button>
-          <Button type="button" onClick={() => setDraft(null)}>
+          <Button type="submit" size="sm" variant="primary">
+            Save
+          </Button>
+          <Button type="button" size="sm" onClick={() => setDraft(null)}>
             Cancel
           </Button>
         </form>
       ) : (
         <>
           <span
-            className={cn('flex-1', todo.completed && 'text-muted line-through')}
+            className={cn(
+              'min-w-0 flex-1 break-words',
+              todo.completed && 'text-muted line-through',
+            )}
             onDoubleClick={() => setDraft(todo.title)}
           >
             {todo.title}
@@ -124,6 +130,7 @@ function TodoItem({
           </Button>
           <Button
             type="button"
+            size="sm"
             onClick={() => setDraft(todo.title)}
             aria-label={`Edit "${todo.title}"`}
           >
@@ -131,6 +138,8 @@ function TodoItem({
           </Button>
           <Button
             type="button"
+            size="sm"
+            variant="danger"
             onClick={() => onDelete(todo.id)}
             aria-label={`Delete "${todo.title}"`}
           >
