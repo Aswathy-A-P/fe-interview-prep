@@ -1,5 +1,7 @@
 import { useEffect, useId, useState } from 'react';
 import Button from '../../components/ui/Button.tsx';
+import { cardClass } from '../../components/ui/fieldStyles.ts';
+import { cn } from '../../lib/cn.ts';
 import { useIdleTimer } from './useIdleTimer.ts';
 
 interface IdleWarningProps {
@@ -38,21 +40,21 @@ function IdleWarning({ idleMs, warningMs, onLogout }: IdleWarningProps) {
   if (secondsLeft === null) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-50 grid place-items-center bg-ink/40 p-4">
       <div
         role="alertdialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="w-full max-w-sm rounded-lg border border-border bg-surface p-5 shadow-lg"
+        className={cn(cardClass, 'w-full max-w-sm space-y-4 p-6 shadow-lg')}
       >
-        <h2 id={titleId} className="mb-2 text-lg font-semibold">
+        <h2 id={titleId} className="text-lg font-semibold text-ink">
           Are you still there?
         </h2>
-        <p id={descriptionId} className="mb-4 tabular-nums">
+        <p id={descriptionId} className="text-muted tabular-nums">
           You'll be logged out in {secondsLeft}s due to inactivity.
         </p>
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-3">
           <Button type="button" onClick={onLogout}>
             Log out
           </Button>

@@ -83,7 +83,7 @@ function AuthProvider({ children, connectSync = connectSessionSync }: AuthProvid
 
   if (state.status === 'restoring') {
     return (
-      <p className="text-muted" role="status">
+      <p className="py-16 text-center text-muted" role="status">
         Restoring session…
       </p>
     );

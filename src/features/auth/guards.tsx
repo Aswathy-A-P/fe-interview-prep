@@ -1,4 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import Page from '../../components/ui/Page.tsx';
+import { cardClass } from '../../components/ui/fieldStyles.ts';
+import { cn } from '../../lib/cn.ts';
 import { useAuth } from './authContext.ts';
 import type { Role } from './types.ts';
 
@@ -17,10 +20,11 @@ export function RequireRole({ role }: { role: Role }) {
 
   if (user?.role !== role) {
     return (
-      <section>
-        <h1 className="mb-4 text-3xl font-bold">Access denied</h1>
-        <p className="text-danger">This page is only available to {role}s.</p>
-      </section>
+      <Page title="Access denied" width="sm">
+        <div className={cn(cardClass, 'border-danger/30 bg-danger/5 p-6 text-center')}>
+          <p className="text-danger">This page is only available to {role}s.</p>
+        </div>
+      </Page>
     );
   }
   return <Outlet />;
