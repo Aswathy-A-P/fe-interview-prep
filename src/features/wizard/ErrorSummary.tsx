@@ -26,20 +26,20 @@ function ErrorSummary({ errors }: ErrorSummaryProps) {
   return (
     <div
       role="alert"
-      className="mb-4 rounded-md border border-danger px-4 py-3 text-sm text-danger"
+      className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger"
     >
       <p className="font-semibold">
         {count} {count === 1 ? 'error' : 'errors'}: please fix {count === 1 ? 'it' : 'them'} to
         continue.
       </p>
-      <ul className="mt-1 list-disc pl-5">
+      <ul className="mt-2 list-disc space-y-1 pl-5">
         {entries.map(([field, message]) => {
           const target = FIELD_TARGETS[field];
           return (
             <li key={field}>
               <button
                 type="button"
-                className="cursor-pointer underline"
+                className="cursor-pointer text-left underline underline-offset-2 hover:no-underline"
                 onClick={() => document.getElementById(target?.id ?? field)?.focus()}
               >
                 {`${target?.label ?? field}: ${message}`}

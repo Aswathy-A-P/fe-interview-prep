@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import Button from '../../components/ui/Button.tsx';
 import { cardClass } from '../../components/ui/fieldStyles.ts';
+import Page from '../../components/ui/Page.tsx';
 import { cn } from '../../lib/cn.ts';
 import { usePersistentState } from '../../hooks/usePersistentState.ts';
+import { questions } from '../../questions.ts';
 import { submitRegistration, type SubmitRegistration } from './api.ts';
 import ErrorSummary from './ErrorSummary.tsx';
 import ProgressIndicator from './ProgressIndicator.tsx';
@@ -28,6 +30,8 @@ import {
 
 export const DATA_KEY = 'q3.data';
 export const STEP_KEY = 'q3.step';
+
+const DESCRIPTION = questions.find((question) => question.number === 3)?.summary;
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 
@@ -109,74 +113,103 @@ function WizardPage({ submit = submitRegistration }: WizardPageProps) {
 
   if (status === 'success') {
     return (
-      <section className="max-w-140">
-        <h1 className="mb-4 text-3xl font-bold">Registration Wizard</h1>
-        <div role="status" className={cn(cardClass, 'mb-4 px-5 py-4')}>
-          <h2 className="mb-2 text-xl font-semibold">You're registered!</h2>
-          <p>Thanks, {registeredName}. We've received your registration.</p>
+      <Page title="Registration Wizard" description={DESCRIPTION} width="md">
+        <div
+          role="status"
+          className={cn(cardClass, 'flex flex-col items-center gap-3 p-6 text-center sm:p-8')}
+        >
+          <span className="grid size-14 place-items-center rounded-full bg-accent/10 text-accent">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="size-7"
+            >
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
+          </span>
+          <h2 className="text-xl font-semibold text-ink">You're registered!</h2>
+          <p className="text-muted">Thanks, {registeredName}. We've received your registration.</p>
         </div>
-        <Button type="button" onClick={() => setStatus('idle')}>
-          Start a new registration
-        </Button>
-      </section>
+        <div className="flex justify-center">
+          <Button type="button" onClick={() => setStatus('idle')}>
+            Start a new registration
+          </Button>
+        </div>
+      </Page>
     );
   }
 
   const submitting = status === 'submitting';
 
   return (
-    <section className="max-w-140">
-      <h1 className="mb-4 text-3xl font-bold">Registration Wizard</h1>
+    <Page title="Registration Wizard" description={DESCRIPTION} width="md">
       <ProgressIndicator current={step} />
 
-      <form ref={formRef} className={cn(cardClass, 'px-5 py-4')} noValidate onSubmit={handleSubmit}>
-        <h2 ref={headingRef} tabIndex={-1} className="mb-4 text-xl font-semibold outline-none">
+      <form
+        ref={formRef}
+        className={cn(cardClass, 'space-y-6 p-6 sm:p-8')}
+        noValidate
+        onSubmit={handleSubmit}
+      >
+        <h2 ref={headingRef} tabIndex={-1} className="text-xl font-semibold text-ink outline-none">
           {STEP_LABELS[step]}
         </h2>
 
         {showErrors && <ErrorSummary key={attempt} errors={validateStep(step, data)} />}
 
-        {step === 'personal' && (
-          <PersonalStep
-            value={data.personal}
-            errors={showErrors ? validatePersonal(data.personal) : {}}
-            onChange={(personal) => setData((current) => ({ ...current, personal }))}
-          />
-        )}
-        {step === 'address' && (
-          <AddressStep
-            value={data.address}
-            errors={showErrors ? validateAddress(data.address) : {}}
-            onChange={(address) => setData((current) => ({ ...current, address }))}
-          />
-        )}
-        {step === 'preferences' && (
-          <PreferencesStep
-            value={data.preferences}
-            errors={showErrors ? validatePreferences(data.preferences) : {}}
-            onChange={(preferences) => setData((current) => ({ ...current, preferences }))}
-          />
-        )}
-        {step === 'review' && <ReviewStep data={data} onEdit={goTo} />}
+        <div className="space-y-5">
+          {step === 'personal' && (
+            <PersonalStep
+              value={data.personal}
+              errors={showErrors ? validatePersonal(data.personal) : {}}
+              onChange={(personal) => setData((current) => ({ ...current, personal }))}
+            />
+          )}
+          {step === 'address' && (
+            <AddressStep
+              value={data.address}
+              errors={showErrors ? validateAddress(data.address) : {}}
+              onChange={(address) => setData((current) => ({ ...current, address }))}
+            />
+          )}
+          {step === 'preferences' && (
+            <PreferencesStep
+              value={data.preferences}
+              errors={showErrors ? validatePreferences(data.preferences) : {}}
+              onChange={(preferences) => setData((current) => ({ ...current, preferences }))}
+            />
+          )}
+          {step === 'review' && <ReviewStep data={data} onEdit={goTo} />}
+        </div>
 
         {status === 'error' && (
-          <p role="alert" className="mb-4 text-sm text-danger">
+          <p
+            role="alert"
+            className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger"
+          >
             Something went wrong. Please try again.
           </p>
         )}
 
-        <div className="flex items-center justify-end gap-3">
-          {step !== 'personal' && (
+        <div className="mt-2 flex items-center justify-between gap-3 border-t border-border pt-6">
+          {step !== 'personal' ? (
             <Button type="button" disabled={submitting} onClick={() => goTo(previousStep(step))}>
               Back
             </Button>
+          ) : (
+            <span aria-hidden="true" />
           )}
           <Button type="submit" variant="primary" disabled={submitting}>
             {step === 'review' ? (submitting ? 'Submitting…' : 'Submit') : 'Next'}
           </Button>
         </div>
       </form>
-    </section>
+    </Page>
   );
 }
 

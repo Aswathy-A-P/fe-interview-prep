@@ -1,4 +1,5 @@
 import { fieldClass } from '../../../components/ui/fieldStyles.ts';
+import { cn } from '../../../lib/cn.ts';
 import TextField from '../TextField.tsx';
 import { COUNTRIES, type Address, type FieldErrors } from '../types.ts';
 
@@ -11,12 +12,14 @@ interface AddressStepProps {
 function AddressStep({ value, errors, onChange }: AddressStepProps) {
   return (
     <>
-      <div className="mb-4 flex flex-col gap-1">
-        <label htmlFor="country">Country</label>
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="country" className="text-sm font-medium text-ink">
+          Country
+        </label>
         <select
           id="country"
           value={value.country}
-          className={fieldClass}
+          className={cn(fieldClass, 'w-full')}
           aria-required="true"
           aria-invalid={errors.country ? true : undefined}
           aria-describedby={errors.country ? 'country-error' : undefined}
