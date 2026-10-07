@@ -32,4 +32,6 @@ Stack: Vite, React 19, TypeScript (strict), React Router, Vitest, Testing Librar
 | 4 | Data Table | [#4](https://github.com/Aswathy-A-P/fe-interview-prep/pull/4) |
 | 5 | Login & Session Handling | [#5](https://github.com/Aswathy-A-P/fe-interview-prep/pull/5) |
 
+Optional extras for all five questions: [#6](https://github.com/Aswathy-A-P/fe-interview-prep/pull/6)
+
 **Video:**
