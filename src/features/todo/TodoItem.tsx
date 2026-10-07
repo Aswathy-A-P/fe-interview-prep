@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useState, type DragEvent, type FormEvent, type KeyboardEvent } from 'react';
 import Button from '../../components/ui/Button.tsx';
 import { fieldClass } from '../../components/ui/fieldStyles.ts';
 import { cn } from '../../lib/cn.ts';
@@ -9,9 +9,28 @@ interface TodoItemProps {
   onToggle: (id: string) => void;
   onRename: (id: string, title: string) => void;
   onDelete: (id: string) => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  isDropTarget: boolean;
+  onDragStart: () => void;
+  onDragEnter: () => void;
+  onDrop: () => void;
+  onDragEnd: () => void;
 }
 
-function TodoItem({ todo, onToggle, onRename, onDelete }: TodoItemProps) {
+function TodoItem({
+  todo,
+  onToggle,
+  onRename,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+  isDropTarget,
+  onDragStart,
+  onDragEnter,
+  onDrop,
+  onDragEnd,
+}: TodoItemProps) {
   const [draft, setDraft] = useState<string | null>(null);
   const isEditing = draft !== null;
 
@@ -25,8 +44,35 @@ function TodoItem({ todo, onToggle, onRename, onDelete }: TodoItemProps) {
     if (event.key === 'Escape') setDraft(null);
   };
 
+  const startDrag = (event: DragEvent<HTMLLIElement>) => {
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', todo.id);
+    onDragStart();
+  };
+
+  const allowDrop = (event: DragEvent<HTMLLIElement>) => {
+    event.preventDefault();
+    onDragEnter();
+  };
+
+  const drop = (event: DragEvent<HTMLLIElement>) => {
+    event.preventDefault();
+    onDrop();
+  };
+
   return (
-    <li className="flex items-center gap-2 border-b border-border px-3 py-2 last:border-b-0">
+    <li
+      draggable={!isEditing}
+      onDragStart={startDrag}
+      onDragOver={allowDrop}
+      onDrop={drop}
+      onDragEnd={onDragEnd}
+      className={cn(
+        'flex items-center gap-2 border-b border-border px-3 py-2 last:border-b-0',
+        !isEditing && 'cursor-grab',
+        isDropTarget && 'bg-accent/10 outline-2 -outline-offset-2 outline-accent outline-dashed',
+      )}
+    >
       <input
         type="checkbox"
         checked={todo.completed}
@@ -56,6 +102,26 @@ function TodoItem({ todo, onToggle, onRename, onDelete }: TodoItemProps) {
           >
             {todo.title}
           </span>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            onClick={onMoveUp}
+            disabled={!onMoveUp}
+            aria-label={`Move "${todo.title}" up`}
+          >
+            ↑
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            onClick={onMoveDown}
+            disabled={!onMoveDown}
+            aria-label={`Move "${todo.title}" down`}
+          >
+            ↓
+          </Button>
           <Button
             type="button"
             onClick={() => setDraft(todo.title)}

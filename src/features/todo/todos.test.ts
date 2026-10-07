@@ -3,6 +3,7 @@ import {
   clearCompleted,
   countActive,
   isTodoList,
+  moveTodo,
   renameTodo,
   toggleTodo,
   visibleTodos,
@@ -39,5 +40,14 @@ describe('todo helpers', () => {
     expect(isTodoList(sample)).toBe(true);
     expect(isTodoList([{ id: 1 }])).toBe(false);
     expect(isTodoList('nope')).toBe(false);
+  });
+
+  it('moves a todo to the position of another without mutating the input', () => {
+    const list: Todo[] = ['a', 'b', 'c', 'd'].map((id) => ({ id, title: id, completed: false }));
+    expect(moveTodo(list, 'a', 'c').map((t) => t.id)).toEqual(['b', 'c', 'a', 'd']);
+    expect(moveTodo(list, 'd', 'b').map((t) => t.id)).toEqual(['a', 'd', 'b', 'c']);
+    expect(moveTodo(list, 'a', 'a')).toBe(list);
+    expect(moveTodo(list, 'a', 'missing')).toBe(list);
+    expect(list.map((t) => t.id)).toEqual(['a', 'b', 'c', 'd']);
   });
 });

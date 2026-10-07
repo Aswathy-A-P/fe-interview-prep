@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Button from '../../components/ui/Button.tsx';
 import { cardClass, fieldClass } from '../../components/ui/fieldStyles.ts';
 import { usePersistentState } from '../../hooks/usePersistentState.ts';
@@ -12,6 +13,7 @@ import {
   deleteTodo,
   isFilter,
   isTodoList,
+  moveTodo,
   renameTodo,
   toggleTodo,
   visibleTodos,
@@ -20,7 +22,6 @@ import {
 } from './todos.ts';
 
 export const TODOS_KEY = 'q1.todos';
-export const FILTER_KEY = 'q1.filter';
 
 const FILTER_LABELS: Record<Filter, string> = {
   all: 'All',
@@ -30,8 +31,30 @@ const FILTER_LABELS: Record<Filter, string> = {
 
 function TodoPage() {
   const [todos, setTodos] = usePersistentState<Todo[]>(TODOS_KEY, [], { isValid: isTodoList });
-  const [filter, setFilter] = usePersistentState<Filter>(FILTER_KEY, 'all', { isValid: isFilter });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const param = searchParams.get('filter');
+  const filter: Filter = isFilter(param) ? param : 'all';
   const [title, setTitle] = useState('');
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
+
+  const setFilter = (next: Filter) => {
+    setSearchParams((params) => {
+      const updated = new URLSearchParams(params);
+      if (next === 'all') updated.delete('filter');
+      else updated.set('filter', next);
+      return updated;
+    });
+  };
+
+  const move = (fromId: string, toId: string) => {
+    setTodos((current) => moveTodo(current, fromId, toId));
+  };
+
+  const endDrag = () => {
+    setDraggedId(null);
+    setOverId(null);
+  };
 
   const shown = visibleTodos(todos, filter);
   const itemsLeft = countActive(todos);
@@ -79,15 +102,29 @@ function TodoPage() {
         </p>
       ) : (
         <ul className={cn(cardClass, 'm-0 list-none p-0')}>
-          {shown.map((todo) => (
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              onToggle={(id) => setTodos((current) => toggleTodo(current, id))}
-              onRename={(id, next) => setTodos((current) => renameTodo(current, id, next))}
-              onDelete={(id) => setTodos((current) => deleteTodo(current, id))}
-            />
-          ))}
+          {shown.map((todo, index) => {
+            const previous = shown[index - 1];
+            const next = shown[index + 1];
+            return (
+              <TodoItem
+                key={todo.id}
+                todo={todo}
+                onToggle={(id) => setTodos((current) => toggleTodo(current, id))}
+                onRename={(id, next) => setTodos((current) => renameTodo(current, id, next))}
+                onDelete={(id) => setTodos((current) => deleteTodo(current, id))}
+                onMoveUp={previous ? () => move(todo.id, previous.id) : undefined}
+                onMoveDown={next ? () => move(todo.id, next.id) : undefined}
+                isDropTarget={draggedId !== null && draggedId !== todo.id && overId === todo.id}
+                onDragStart={() => setDraggedId(todo.id)}
+                onDragEnter={() => setOverId(todo.id)}
+                onDrop={() => {
+                  if (draggedId) move(draggedId, todo.id);
+                  endDrag();
+                }}
+                onDragEnd={endDrag}
+              />
+            );
+          })}
         </ul>
       )}
 
