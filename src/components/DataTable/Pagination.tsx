@@ -1,5 +1,6 @@
 import Button from '../ui/Button.tsx';
 import { fieldClass } from '../ui/fieldStyles.ts';
+import { cn } from '../../lib/cn.ts';
 import { PAGE_SIZES, isPageSize, type PageSize } from './tableUtils.ts';
 
 interface PaginationProps {
@@ -19,13 +20,13 @@ function Pagination({
 }: PaginationProps) {
   return (
     <nav
-      className="mt-4 flex flex-wrap items-center justify-end gap-3 text-sm"
+      className="flex flex-wrap items-center justify-between gap-4 text-sm"
       aria-label="Pagination"
     >
-      <label>
-        Rows per page{' '}
+      <label className="inline-flex items-center gap-2 font-medium">
+        Rows per page
         <select
-          className={fieldClass}
+          className={cn(fieldClass, 'py-1.5 text-sm font-normal')}
           value={pageSize}
           onChange={(event) => {
             const size = Number(event.target.value);
@@ -39,15 +40,17 @@ function Pagination({
           ))}
         </select>
       </label>
-      <Button size="sm" onClick={() => onPageChange(page - 1)} disabled={page <= 1}>
-        Previous
-      </Button>
-      <span>
-        Page {page} of {totalPages}
-      </span>
-      <Button size="sm" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages}>
-        Next
-      </Button>
+      <div className="flex items-center gap-3">
+        <span className="text-muted tabular-nums">
+          Page {page} of {totalPages}
+        </span>
+        <Button size="sm" onClick={() => onPageChange(page - 1)} disabled={page <= 1}>
+          Previous
+        </Button>
+        <Button size="sm" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages}>
+          Next
+        </Button>
+      </div>
     </nav>
   );
 }

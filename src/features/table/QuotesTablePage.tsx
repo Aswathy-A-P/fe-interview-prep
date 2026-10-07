@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Button from '../../components/ui/Button.tsx';
+import Page from '../../components/ui/Page.tsx';
 import { cardClass, fieldClass } from '../../components/ui/fieldStyles.ts';
 import { cn } from '../../lib/cn.ts';
 import DataTable from '../../components/DataTable/DataTable.tsx';
@@ -35,95 +36,110 @@ function QuotesTablePage() {
   const visibleCount = COLUMN_IDS.length - view.hidden.length;
 
   return (
-    <section className="space-y-4">
-      <h1 className="text-3xl font-bold">Data Table</h1>
+    <Page
+      title="Data Table"
+      description="A reusable table with sorting, search, filters and a shareable URL view."
+      width="xl"
+    >
+      <div className={cn(cardClass, 'space-y-4 p-4 sm:p-5')}>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,16rem)_auto_auto] lg:items-end">
+          <label className="flex flex-col gap-1.5 text-sm font-medium sm:col-span-2 lg:col-span-1">
+            <span>Search</span>
+            <input
+              type="search"
+              value={view.q}
+              disabled={server}
+              aria-describedby={server ? SERVER_NOTE_ID : undefined}
+              onChange={(event) =>
+                setView(changeView(view, { q: event.target.value }), { replace: view.q !== '' })
+              }
+              placeholder="Quote or author"
+              className={cn(fieldClass, 'w-full font-normal disabled:opacity-60')}
+            />
+          </label>
+          <label className="flex flex-col gap-1.5 text-sm font-medium">
+            <span>Author</span>
+            <select
+              className={cn(fieldClass, 'w-full font-normal disabled:opacity-60')}
+              value={view.author}
+              disabled={server}
+              aria-describedby={server ? SERVER_NOTE_ID : undefined}
+              onChange={(event) => setView(changeView(view, { author: event.target.value }))}
+            >
+              <option value="">All authors</option>
+              {table.status === 'ready' &&
+                table.authors.map((author) => (
+                  <option key={author} value={author}>
+                    {author}
+                  </option>
+                ))}
+            </select>
+          </label>
+          <label className="inline-flex h-10 items-center gap-2 text-sm font-medium whitespace-nowrap lg:justify-self-end">
+            <input
+              type="checkbox"
+              checked={server}
+              onChange={(event) =>
+                setView(changeView(view, { mode: event.target.checked ? 'server' : 'client' }))
+              }
+              className="size-4 accent-accent"
+            />
+            Server-side paging
+          </label>
+          <details className="relative lg:justify-self-end">
+            <summary className="inline-flex h-10 cursor-pointer items-center rounded-lg border border-border bg-white px-3 text-sm font-medium text-ink shadow-xs select-none hover:bg-surface">
+              Columns
+            </summary>
+            <fieldset
+              className={cn(cardClass, 'absolute right-0 z-30 mt-2 w-48 space-y-2 p-3 shadow-lg')}
+            >
+              <legend className="sr-only">Visible columns</legend>
+              {COLUMNS.map((column) => {
+                const visible = !view.hidden.includes(column.id);
+                return (
+                  <label
+                    key={column.id}
+                    className="flex items-center gap-2 text-sm whitespace-nowrap"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={visible}
+                      disabled={visible && visibleCount === 1}
+                      onChange={(event) =>
+                        setView(toggleColumn(view, COLUMN_IDS, column.id, event.target.checked))
+                      }
+                      className="size-4 accent-accent"
+                    />
+                    {column.header}
+                  </label>
+                );
+              })}
+            </fieldset>
+          </details>
+        </div>
 
-      <div className="flex flex-wrap items-center gap-4">
-        <label>
-          Search{' '}
-          <input
-            type="search"
-            value={view.q}
-            disabled={server}
-            aria-describedby={server ? SERVER_NOTE_ID : undefined}
-            onChange={(event) =>
-              setView(changeView(view, { q: event.target.value }), { replace: view.q !== '' })
-            }
-            placeholder="Quote or author"
-            className={cn(fieldClass, 'w-72 disabled:opacity-60')}
-          />
-        </label>
-        <label>
-          Author{' '}
-          <select
-            className={cn(fieldClass, 'max-w-64 disabled:opacity-60')}
-            value={view.author}
-            disabled={server}
-            aria-describedby={server ? SERVER_NOTE_ID : undefined}
-            onChange={(event) => setView(changeView(view, { author: event.target.value }))}
-          >
-            <option value="">All authors</option>
-            {table.status === 'ready' &&
-              table.authors.map((author) => (
-                <option key={author} value={author}>
-                  {author}
-                </option>
-              ))}
-          </select>
-        </label>
-        <label className="inline-flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={server}
-            onChange={(event) =>
-              setView(changeView(view, { mode: event.target.checked ? 'server' : 'client' }))
-            }
-          />
-          Server-side paging
-        </label>
-        <details className="relative">
-          <summary className="cursor-pointer select-none">Columns</summary>
-          <fieldset className={cn(cardClass, 'absolute z-20 mt-1 space-y-1 p-3 shadow-md')}>
-            <legend className="sr-only">Visible columns</legend>
-            {COLUMNS.map((column) => {
-              const visible = !view.hidden.includes(column.id);
-              return (
-                <label key={column.id} className="flex items-center gap-2 whitespace-nowrap">
-                  <input
-                    type="checkbox"
-                    checked={visible}
-                    disabled={visible && visibleCount === 1}
-                    onChange={(event) =>
-                      setView(toggleColumn(view, COLUMN_IDS, column.id, event.target.checked))
-                    }
-                  />
-                  {column.header}
-                </label>
-              );
-            })}
-          </fieldset>
-        </details>
+        {server && (
+          <p id={SERVER_NOTE_ID} className="text-sm text-muted">
+            Search, author filter and sorting are off in server-side paging: the dummyjson quotes
+            endpoint only supports limit and skip, so each page is fetched as-is.
+          </p>
+        )}
       </div>
 
-      {server && (
-        <p id={SERVER_NOTE_ID} className="text-sm text-muted">
-          Search, author filter and sorting are off in server-side paging: the dummyjson quotes
-          endpoint only supports limit and skip, so each page is fetched as-is.
-        </p>
+      {table.status === 'loading' && (
+        <p className="text-center text-sm text-muted">Loading quotes…</p>
       )}
 
-      {table.status === 'loading' && <p className="text-muted">Loading quotes…</p>}
-
       {table.status === 'error' && (
-        <div role="alert" className="space-y-2 text-danger">
+        <div role="alert" className={cn(cardClass, 'space-y-3 p-4 text-danger sm:p-5')}>
           <p>Could not load quotes: {table.message}</p>
           <Button onClick={table.retry}>Retry</Button>
         </div>
       )}
 
       {table.status === 'ready' && (
-        <>
-          <p className="text-muted" aria-live="polite">
+        <div className="space-y-4">
+          <p className="text-sm text-muted" aria-live="polite">
             {table.refreshing
               ? 'Loading page…'
               : `Showing ${table.first}–${table.first === 0 ? 0 : table.first + table.pageRows.length - 1} of ${table.total} quotes`}
@@ -147,9 +163,9 @@ function QuotesTablePage() {
             onPageChange={(next) => setView({ ...view, page: next })}
             onPageSizeChange={(size) => setView(changeView(view, { size }))}
           />
-        </>
+        </div>
       )}
-    </section>
+    </Page>
   );
 }
 
